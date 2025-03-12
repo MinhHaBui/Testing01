@@ -28,6 +28,8 @@ namespace Testing01
     /// </summary>
     public partial class ThemMoi : Window
     {
+
+
         public ThemMoi()
         {
             InitializeComponent();
