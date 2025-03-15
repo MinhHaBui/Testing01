@@ -20,7 +20,8 @@ using OpenQA.Selenium.Interactions;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows.Media.Media3D;
-using OfficeOpenXml;
+
+
 
 namespace Testing01
 
@@ -28,15 +29,30 @@ namespace Testing01
     /// <summary>
     /// Interaction logic for HauKiem.xaml
     /// </summary>
+    
+
     public partial class HauKiem : Window
     {
         public HauKiem()
         {
             InitializeComponent();
         }
+        public static void Main()
+        {
+            string excelFile = @"C:\\Users\\minhh\\OneDrive\\Tài liệu\\DoAnTotNghiep\\DataTest.xlsx\";
+            List<DataHauKiem> dataList = ReadDataFromExcel(excelFile);
+
+            using (IWebDriver driver = InitWebDriver())
+            {
+                Login(driver);
+                NavigateToKhaiThac(driver);
+                ProcessData(driver, dataList, excelFile);
+            }
+        }
 
         private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
         {
+
             // Khởi tạo WebDriver 
             ChromeOptions options = new ChromeOptions();
             options.AddArgument("--start-maximized");
@@ -95,128 +111,96 @@ namespace Testing01
                 // Chờ popup hiển thị
                 Thread.Sleep(2000);
                 Debug.WriteLine("Popup đã mở thành công!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Có lỗi xảy ra: " + ex.Message);
+            }
+        }
 
-
-                // Đọc dữ liệu từ file Excel
-                List<DataHauKiem> haukiemlist = ReadDataFromExcel("DataTest.xlsx");
-
-                foreach (var HK in haukiemlist)
+            private static void ProcessData(IWebDriver driver, List<DataHauKiem> dataList, string excelFile)
                 {
-                    // Tìm và click vào nút "Thêm mới"
-                    IWebElement addNewButton = chromeDriver.FindElement(By.XPath("//*[@id=\"horizontal-slider\"]/div/div[2]/div/div[1]/button[2]"));
-                    addNewButton.Click();
-
-                    // Chờ để trang thêm công trình tải
-                    // wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Id("construction-name-input"))); // Chờ ô nhập tên công trình
-
-                    // Điền dữ liệu vào các trường
-                    chromeDriver.FindElement(By.Id("")).SendKeys(HK.NgayThang);
-                    chromeDriver.FindElement(By.Id("//div[contains(@class:'MuiInputBase-colorPrimary')]//input")).SendKeys(HK.SoVanBan);
-                    chromeDriver.FindElement(By.Id("name")).SendKeys(HK.NoiDungVanBan);
-                    chromeDriver.FindElement(By.Id("")).SendKeys(HK.Loai);
-                    chromeDriver.FindElement(By.Id("")).SendKeys(HK.Nam);
-                    chromeDriver.FindElement(By.Id("")).SendKeys(HK.SoQuyetDinh);
-                    chromeDriver.FindElement(By.XPath("//div[contains(@class: 'MuiInputBase-colorPrimary')]")).SendKeys(HK.GhiChu);
-
-                    // Click nút "Lưu"
-                    chromeDriver.FindElement(By.XPath("/html/body/div[2]/div[3]/form/div/div[3]/button[2]")).Click();
-
-                    // Chờ một chút cho công trình được thêm vào (có thể thêm WebDriverWait để kiểm tra công trình xuất hiện trong danh sách)
-                    //wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("//tr[td[contains(text(), '" + construction.Name + "')]]")));
-
-                    // Kiểm tra công trình vừa thêm có tồn tại trong danh sách hay không
-                    bool isAdded = CheckIfConstructionExists(chromeDriver, HK.NoiDungVanBan);
-                    if (isAdded)
+                    foreach (var data in dataList)
                     {
-                        Console.WriteLine($"Văn bản {HK.NoiDungVanBan} đã được thêm thành công.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Văn bản {HK.NoiDungVanBan} chưa được thêm.");
+                        AddNewRecord(driver, data);
+                        bool isAdded = CheckIfConstructionExists(driver, data.NoiDungVanBan);
+                        Debug.WriteLine(isAdded ? $"{data.NoiDungVanBan} thêm thành công!" : $"{data.NoiDungVanBan} thêm thất bại!");
+                        ExportResultToExcel(excelFile, data, isAdded ? "Pass" : "Fail");
                     }
                 }
 
-
-
-
-            }
-
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Lỗi: " + ex.Message);
-            }
-
-
-        }
-
-
-        // Đọc dữ liệu từ file Excel
-        static List<DataHauKiem> ReadDataFromExcel(string filePath)
-        {
-            List<DataHauKiem> dataList = new List<DataHauKiem>();
-
-            // Đảm bảo rằng file Excel tồn tại
-            if (File.Exists(filePath))
-            {
-                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                private static void AddNewRecord(IWebDriver chromeDriver, DataHauKiem data)
                 {
-                    var worksheet = package.Workbook.Worksheets[1]; // Lấy worksheet đầu tiên
+                    chromeDriver.FindElement(By.XPath("//button[contains(text(),'Thêm mới')]")).Click();
+                    WebDriverWait wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(5));
+                    wait.Until(d => d.FindElement(By.Id("name"))).SendKeys(data.NoiDungVanBan);
+                    chromeDriver.FindElement(By.Id("soVanBan"))?.SendKeys(data.SoVanBan);
+                    chromeDriver.FindElement(By.Id("loai"))?.SendKeys(data.Loai);
+                    chromeDriver.FindElement(By.Id("nam"))?.SendKeys(data.Nam);
+                    chromeDriver.FindElement(By.Id("soQuyetDinh"))?.SendKeys(data.SoQuyetDinh);
+                    chromeDriver.FindElement(By.Id("ghiChu"))?.SendKeys(data.GhiChu);
+                    chromeDriver.FindElement(By.XPath("//button[contains(text(),'Lưu')]")).Click();
+                }
 
-                    int rowCount = worksheet.Dimension.Rows; // Số lượng hàng trong worksheet
-
-                    // Bắt đầu từ dòng 2 (vì dòng 1 là header)
-                    for (int row = 2; row <= rowCount; row++)
+                private static bool CheckIfConstructionExists(IWebDriver driver, string noiDungVanBan)
+                {
+                    try
                     {
-                        DataHauKiem data = new DataHauKiem
+                        return driver.FindElements(By.XPath("//table//tr/td[2]")).Any(el => el.Text.Contains(noiDungVanBan));
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+
+                private static List<DataHauKiem> ReadDataFromExcel(string filePath)
+                {
+                    List<DataHauKiem> dataList = new List<DataHauKiem>();
+                    if (!File.Exists(filePath)) return dataList;
+
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    {
+                        var worksheet = package.Workbook.Worksheets[1];
+                        int rowCount = worksheet.Dimension.Rows;
+                        for (int row = 2; row <= rowCount; row++)
                         {
-                            NgayThang = worksheet.Cells[row, 1].Text,
-                            SoVanBan = worksheet.Cells[row, 2].Text,
-                            NoiDungVanBan = worksheet.Cells[row, 3].Text,
-                            Loai = worksheet.Cells[row, 4].Text,
-                            Nam = worksheet.Cells[row, 5].Text,
-                            SoQuyetDinh = worksheet.Cells[row, 6].Text,
-                            GhiChu = worksheet.Cells[row, 7].Text,
-
-                        };
-                        dataList.Add(data);
-
-
+                            dataList.Add(new DataHauKiem
+                            {
+                                NgayThang = worksheet.Cells[row, 1].Text,
+                                SoVanBan = worksheet.Cells[row, 2].Text,
+                                NoiDungVanBan = worksheet.Cells[row, 3].Text,
+                                Loai = worksheet.Cells[row, 4].Text,
+                                Nam = worksheet.Cells[row, 5].Text,
+                                SoQuyetDinh = worksheet.Cells[row, 6].Text,
+                                GhiChu = worksheet.Cells[row, 7].Text,
+                            });
+                        }
                     }
+                    return dataList;
                 }
-            }
 
-            else
-            {
-                Console.WriteLine("File Excel không tồn tại.");
-            }
-
-            return dataList;
-        }
-
-        // Kiểm tra công trình có tồn tại trong danh sách hay không
-        static bool CheckIfConstructionExists(IWebDriver driver, string constructionName)
-        {
-            try
-            {
-                // Kiểm tra xem văn bản đã được thêm vào danh sách (giả sử bảng văn bản có <tr> chứa tên văn bản)
-                IList<IWebElement> constructionRows = driver.FindElements(By.XPath("//table//tr/td[2]")); // Giả sử tên văn bản nằm ở cột thứ 2
-                foreach (var row in constructionRows)
+                private static void ExportResultToExcel(string filePath, DataHauKiem data, string result)
                 {
-                    if (row.Text.Contains(constructionName))
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
                     {
-                        return true;
+                        var worksheet = package.Workbook.Worksheets[2];
+                        int rowCount = worksheet.Dimension.Rows;
+                        for (int row = 2; row <= rowCount; row++)
+                        {
+                            if (worksheet.Cells[row, 3].Text == data.NoiDungVanBan)
+                            {
+                                int lastColumn = worksheet.Dimension.Columns + 1;
+                                worksheet.Cells[row, lastColumn].Value = result;
+                                break;
+                            }
+                        }
+                        package.Save();
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Lỗi khi kiểm tra van ban: " + ex.Message);
-            }
-            return false;
-        }
 
-        // Lớp để lưu trữ dữ liệu công trình
-        public class DataHauKiem
+    public class DataHauKiem
         {
             public string NgayThang { get; set; }
             public string SoVanBan { get; set; }
@@ -226,6 +210,4 @@ namespace Testing01
             public string SoQuyetDinh { get; set; }
             public string GhiChu { get; set; }
         }
-
     }
-}

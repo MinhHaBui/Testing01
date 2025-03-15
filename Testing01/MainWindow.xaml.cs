@@ -99,19 +99,18 @@ namespace Testing01
 
 
 
-                // tìm ô dropdowmlist 
-                //
+                // Tìm ô lọc Loai cong trinh
+                IWebElement filterProvinceDropdown = chromeDriver.FindElement(By.XPath("//div[contains(@class, 'MuiAutocomplete-endAdornment')]//button"));
 
                 // Click vào ô lọc Loại công trình
-                IWebElement filterTypeDropdown = chromeDriver.FindElement(By.XPath(""));
+                IWebElement filterTypeDropdown = chromeDriver.FindElement(By.XPath("//div[contains(@class, 'MuiAutocomplete-endAdornment')]//button"));
                 filterTypeDropdown.Click();
                 Thread.Sleep(1000); // Chờ một chút để dropdown mở ra
 
-                // Nếu là một menu dropdown, chọn một giá trị bất kỳ
-                // Giả sử có một danh sách các lựa chọn trong dropdown, bạn có thể chọn loại công trình bằng cách tìm theo nội dung
+                // danh sách các lựa chọn trong dropdown, chọn loại công trình bằng cách tìm theo nội dung
                 IWebElement option = chromeDriver.FindElement(By.XPath("//option[contains(text(), 'Thủy điện')]")); 
                 option.Click();
-                Thread.Sleep(2000); // Chờ để xem kết quả sau khi chọn
+                Thread.Sleep(2000);
 
                 // Tìm tất cả các công trình hiển thị (Giả sử các công trình có thẻ <tr> và cột "Loại hình" có mã là "L1")
                 IList<IWebElement> constructionRows = chromeDriver.FindElements(By.XPath("//table//tr")); // Tìm tất cả các dòng trong bảng công trình
@@ -158,7 +157,7 @@ namespace Testing01
                 }
 
         //LỌC CÔNG TRÌNH_TỈNH 
-                // Tìm ô lọc tỉnh (Giả sử có class là 'filter-province')
+                // Tìm ô lọc tỉnh 
                 IWebElement filterProvinceDropdown = chromeDriver.FindElement(By.ClassName("filter-province"));
 
                 // Click vào ô lọc tỉnh
@@ -215,16 +214,16 @@ namespace Testing01
                 }
 
                 //LỌC CÔNG TRÌNH_TÌM KIẾM 
-                // Tìm ô tìm kiếm (Giả sử ô tìm kiếm có ID là 'search-input')
-                IWebElement searchInput = chromeDriver.FindElement(By.Id("search-input"));
+                // Tìm ô tìm kiếm 
+                IWebElement searchInput = chromeDriver.FindElement(By.XPath("//div[contains(@class, 'MuiOutlinedInput-root')]//input"));
 
                 // Nhập từ khóa "Th" vào ô tìm kiếm
                 searchInput.SendKeys("Th");
 
                 // Chờ một chút cho kết quả lọc được áp dụng
-                Thread.Sleep(2000); // Thay thế bằng WebDriverWait nếu cần đợi các kết quả tải xong
+                Thread.Sleep(2000); 
 
-                // Tìm tất cả các công trình hiển thị (Giả sử các công trình có thẻ <li> và thuộc tính title chứa tên công trình)
+                // Tìm tất cả các công trình hiển thị 
                 IList<IWebElement> constructionItems = chromeDriver.FindElements(By.XPath("//li[@title]"));
 
                 Console.WriteLine("Các công trình hiển thị sau khi lọc:");

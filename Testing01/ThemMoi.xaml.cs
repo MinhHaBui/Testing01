@@ -29,7 +29,6 @@ namespace Testing01
     public partial class ThemMoi : Window
     {
 
-
         public ThemMoi()
         {
             InitializeComponent();
@@ -100,7 +99,7 @@ namespace Testing01
 
 
                 // Đọc dữ liệu từ file Excel
-                List<ConstructionData> constructionList = ReadDataFromExcel("DataTest.xlsx");
+                List<ConstructionData> constructionList = ReadDataFromExcel(@"C:\Users\minhh\OneDrive\Tài liệu\DoAnTotNghiep\DataTest.xlsx");
 
                 foreach (var construction in constructionList)
                 {
