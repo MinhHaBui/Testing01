@@ -124,28 +124,14 @@ namespace Testing01
                 IWebElement filterTypeText = chromeDriver.FindElement(By.XPath("//div[contains(@class, 'MuiAutocomplete-root')]//p[contains(text(), 'Tất cả')]"));
                 filterTypeText.Click();
                 Debug.WriteLine("Click loại công trình thành công!");
-                IWebElement inputField = chromeDriver.FindElement(By.XPath("//div[contains(@class, 'MuiAutocomplete-root')]//input"));
-                inputField.SendKeys("Thủy điện");
-                Debug.WriteLine("Nhập loại công trình xong.");
+                
 
                 // Chờ danh sách gợi ý xuất hiện
                 //WebDriverWait wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(5));
                 IWebElement firstOption = wait.Until(drv => drv.FindElement(By.XPath("//li[contains(@class, 'MuiAutocomplete-option')]")));
 
                 firstOption.Click();
-                Debug.WriteLine("Đã chọn 'Thủy điện' từ dropdown.");
-
-
-
-
-
-                // Tìm ô lọc Loai cong trinh
-                IWebElement filterProvinceDropdown = chromeDriver.FindElement(By.XPath("//div[contains(@class, 'MuiAutocomplete-endAdornment')]//button"));
-
-                // Click vào ô lọc Loại công trình
-                IWebElement filterTypeDropdown = chromeDriver.FindElement(By.XPath("//div[contains(@class, 'MuiAutocomplete-endAdornment')]//button"));
-                filterTypeDropdown.Click();
-                Thread.Sleep(1000); // Chờ một chút để dropdown mở ra
+                Debug.WriteLine("Đã bo chọn 'Tất cả' từ dropdown.");
 
                 // danh sách các lựa chọn trong dropdown, chọn loại công trình bằng cách tìm theo nội dung
                 IWebElement option = chromeDriver.FindElement(By.XPath("//option[contains(text(), 'Thủy điện')]")); 
@@ -198,7 +184,7 @@ namespace Testing01
 
         //LỌC CÔNG TRÌNH_TỈNH 
                 // Tìm ô lọc tỉnh 
-                //IWebElement filterProvinceDropdown = chromeDriver.FindElement(By.ClassName("filter-province"));
+                IWebElement filterProvinceDropdown = chromeDriver.FindElement(By.ClassName("filter-province"));
 
                 // Click vào ô lọc tỉnh
                 filterProvinceDropdown.Click();
