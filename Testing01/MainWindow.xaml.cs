@@ -6,9 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-
-
-
+using System.Windows;
 
 namespace Testing01
 {
@@ -18,6 +16,35 @@ namespace Testing01
         {
             InitializeComponent();
         }
+        private void OpenThemMoi_Click(object sender, RoutedEventArgs e)
+        {
+            ThemMoi themMoiWindow = new ThemMoi();
+            themMoiWindow.Show();
+        }
+        private void OpenUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            Update UpdateWindow = new Update();
+            UpdateWindow.Show();
+        }
+
+        private void OpenDelete_Click(object sender, RoutedEventArgs e)
+        {
+            Delete DeleteWindow = new Delete();
+            DeleteWindow.Show();
+        }
+
+        private void OpenImport_Click(object sender, RoutedEventArgs e)
+        {
+            Import ImportWindow = new Import();
+            ImportWindow.Show();
+        }
+
+        private void OpenExport_Click(object sender, RoutedEventArgs e)
+        {
+            Export ExportWindow = new Export();
+            ExportWindow.Show();
+        }
+
 
         private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
         {
@@ -86,7 +113,7 @@ namespace Testing01
                 Debug.WriteLine("Di chuột ra khỏi menu thành công!");
 
                 // Tìm và click vào nút "Thêm mới công trình"
-                WebDriverWait waitt = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(10));
+                
                 IWebElement addNewButton = chromeDriver.FindElement(By.XPath("//button//span[contains(text(), 'Thêm mới')]"));
                 addNewButton.Click();
                 Debug.WriteLine("Mo popup them moi thanh cong");

@@ -7,8 +7,15 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button Content="Start" Click="Button_Click"></Button>
-        
-        
+        <Button Content="Start" Click="Button_Click" Margin="0,0,550,312"></Button>
+        <Button Content="ThemMoi" Click="OpenThemMoi_Click" Margin="255,0,296,312"></Button>
+        <Button Content="Update" Click="OpenUpdate_Click" Margin="507,0,10,312"></Button>
+        <Button Content="Delete" Click="OpenDelete_Click" Margin="0,127,550,186"></Button>
+        <Button Content="Import" Click=" OpenImport_Click" Margin="255,127,296,186"></Button>
+        <Button Content="Export" Click="OpenExport_Click" Margin="507,127,10,186"></Button>
     </Grid>
+
+
+
+
 </Window>
