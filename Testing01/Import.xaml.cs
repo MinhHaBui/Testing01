@@ -17,6 +17,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using NUnit.Framework;
 using System.IO;
+using System.Diagnostics;
+using OpenQA.Selenium.Interactions;
 
 namespace Testing01
 {
@@ -39,20 +41,68 @@ namespace Testing01
             [SetUp]
             public void Setup()
             {
+
                 ChromeOptions options = new ChromeOptions();
                 options.AddArgument("--start-maximized");
-
-                driver = new ChromeDriver(options);
-                wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                IWebDriver chromeDriver = new ChromeDriver(options);
+                Debug.WriteLine("Khởi tạo ChromeDriver thành công.");
 
                 // Đăng nhập vào hệ thống
-                driver.Navigate().GoToUrl(baseUrl);
-                wait.Until(ExpectedConditions.ElementIsVisible(By.Id("email"))).SendKeys("admin");
-                driver.FindElement(By.Id("password")).SendKeys("Abc123456");
-                driver.FindElement(By.XPath("//button[@type='submit']")).Click();
+                chromeDriver.Navigate().GoToUrl("https://lake-management.desoft.vn/");
+                Debug.WriteLine("Đi tới trang đăng nhập.");
+
+                WebDriverWait wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(10));
+
+                IWebElement eleEmail = wait.Until(driver => driver.FindElement(By.Id("email")));
+                IWebElement elePwd = chromeDriver.FindElement(By.Id("password"));
+                IWebElement eleSub = chromeDriver.FindElement(By.XPath("//button[@type='submit']"));
+
+                Debug.WriteLine("Tìm thấy các trường đăng nhập.");
+
+                eleEmail.SendKeys("admin");
+                Debug.WriteLine("Nhập email xong.");
+
+                elePwd.SendKeys("Abc123456");
+                Debug.WriteLine("Nhập mật khẩu xong.");
+
+                eleSub.Click();
+                Debug.WriteLine("Click nút đăng nhập.");
+
+                wait.Until(driver => driver.Url == "https://lake-management.desoft.vn/");
+                Debug.WriteLine("Đăng nhập thành công!");
 
                 // Chờ trang chính load xong
                 wait.Until(d => d.Url == baseUrl);
+
+                // Chờ menu xuất hiện
+                IWebElement leftMenu = wait.Until(driver => driver.FindElement(By.XPath("//ul[contains(@class, 'navBar')]")));
+                Debug.WriteLine("Đã tìm thấy menu bên trái.");
+
+                Actions actions = new Actions(chromeDriver);
+
+                // Hover vào menu
+                actions.MoveToElement(leftMenu).Perform();
+                Thread.Sleep(1000); // Chờ menu mở
+                Debug.WriteLine("Di chuyển chuột đến menu.");
+
+                // Tìm menu "Công trình khai thác"
+                IWebElement menuKhaiThac = wait.Until(driver => driver.FindElement(By.XPath("//li[@title='Công trình khai thác']")));
+                Debug.WriteLine("Đã tìm thấy menu Công trình khai thác.");
+
+
+                // Tìm nút mở popup trong Công trình khai thác
+                IWebElement btnKhaiThac = wait.Until(driver => driver.FindElement(By.XPath("//li[@title='Công trình khai thác']//button")));
+                Debug.WriteLine("Tìm thấy nút mở popup.");
+
+                // Click vào nút mở popup
+                btnKhaiThac.Click();
+                Debug.WriteLine("Đã nhấn vào nút mở popup.");
+
+                // Chờ popup hiển thị
+                Thread.Sleep(5000);
+                Debug.WriteLine("Popup đã mở thành công!");
+
+
             }
 
             [Test]
@@ -66,7 +116,7 @@ namespace Testing01
                 Assert.IsTrue(successMsg.Text.Contains("Import thành công"), "Import không thành công!");
             }
 
-            
+
 
             [Test]
             public void Test_Import_InvalidFormat()
@@ -137,4 +187,4 @@ namespace Testing01
                 driver.Quit();
             }
         }
-}
+    }

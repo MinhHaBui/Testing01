@@ -29,13 +29,19 @@ namespace Testing01
     /// <summary>
     /// Interaction logic for HauKiem.xaml
     /// </summary>
-    
+
 
     public partial class HauKiem : Window
     {
         public HauKiem()
         {
             InitializeComponent();
+        }
+        private static IWebDriver InitWebDriver()
+        {
+            ChromeOptions options = new ChromeOptions();
+            options.AddArgument("--start-maximized");
+            return new ChromeDriver(options);
         }
         public static void Main()
         {
@@ -44,8 +50,7 @@ namespace Testing01
 
             using (IWebDriver driver = InitWebDriver())
             {
-                Login(driver);
-                NavigateToKhaiThac(driver);
+                
                 ProcessData(driver, dataList, excelFile);
             }
         }
@@ -118,96 +123,96 @@ namespace Testing01
             }
         }
 
-            private static void ProcessData(IWebDriver driver, List<DataHauKiem> dataList, string excelFile)
-                {
-                    foreach (var data in dataList)
-                    {
-                        AddNewRecord(driver, data);
-                        bool isAdded = CheckIfConstructionExists(driver, data.NoiDungVanBan);
-                        Debug.WriteLine(isAdded ? $"{data.NoiDungVanBan} thêm thành công!" : $"{data.NoiDungVanBan} thêm thất bại!");
-                        ExportResultToExcel(excelFile, data, isAdded ? "Pass" : "Fail");
-                    }
-                }
+        private static void ProcessData(IWebDriver driver, List<DataHauKiem> dataList, string excelFile)
+        {
+            foreach (var data in dataList)
+            {
+                AddNewRecord(driver, data);
+                bool isAdded = CheckIfConstructionExists(driver, data.NoiDungVanBan);
+                Debug.WriteLine(isAdded ? $"{data.NoiDungVanBan} thêm thành công!" : $"{data.NoiDungVanBan} thêm thất bại!");
+                ExportResultToExcel(excelFile, data, isAdded ? "Pass" : "Fail");
+            }
+        }
 
-                private static void AddNewRecord(IWebDriver chromeDriver, DataHauKiem data)
-                {
-                    chromeDriver.FindElement(By.XPath("//button[contains(text(),'Thêm mới')]")).Click();
-                    WebDriverWait wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(5));
-                    wait.Until(d => d.FindElement(By.Id("name"))).SendKeys(data.NoiDungVanBan);
-                    chromeDriver.FindElement(By.Id("soVanBan"))?.SendKeys(data.SoVanBan);
-                    chromeDriver.FindElement(By.Id("loai"))?.SendKeys(data.Loai);
-                    chromeDriver.FindElement(By.Id("nam"))?.SendKeys(data.Nam);
-                    chromeDriver.FindElement(By.Id("soQuyetDinh"))?.SendKeys(data.SoQuyetDinh);
-                    chromeDriver.FindElement(By.Id("ghiChu"))?.SendKeys(data.GhiChu);
-                    chromeDriver.FindElement(By.XPath("//button[contains(text(),'Lưu')]")).Click();
-                }
+        private static void AddNewRecord(IWebDriver chromeDriver, DataHauKiem data)
+        {
+            chromeDriver.FindElement(By.XPath("//button[contains(text(),'Thêm mới')]")).Click();
+            WebDriverWait wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(5));
+            wait.Until(d => d.FindElement(By.Id("name"))).SendKeys(data.NoiDungVanBan);
+            chromeDriver.FindElement(By.Id("soVanBan"))?.SendKeys(data.SoVanBan);
+            chromeDriver.FindElement(By.Id("loai"))?.SendKeys(data.Loai);
+            chromeDriver.FindElement(By.Id("nam"))?.SendKeys(data.Nam);
+            chromeDriver.FindElement(By.Id("soQuyetDinh"))?.SendKeys(data.SoQuyetDinh);
+            chromeDriver.FindElement(By.Id("ghiChu"))?.SendKeys(data.GhiChu);
+            chromeDriver.FindElement(By.XPath("//button[contains(text(),'Lưu')]")).Click();
+        }
 
-                private static bool CheckIfConstructionExists(IWebDriver driver, string noiDungVanBan)
-                {
-                    try
-                    {
-                        return driver.FindElements(By.XPath("//table//tr/td[2]")).Any(el => el.Text.Contains(noiDungVanBan));
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                }
+        private static bool CheckIfConstructionExists(IWebDriver driver, string noiDungVanBan)
+        {
+            try
+            {
+                return driver.FindElements(By.XPath("//table//tr/td[2]")).Any(el => el.Text.Contains(noiDungVanBan));
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
-                private static List<DataHauKiem> ReadDataFromExcel(string filePath)
-                {
-                    List<DataHauKiem> dataList = new List<DataHauKiem>();
-                    if (!File.Exists(filePath)) return dataList;
+        private static List<DataHauKiem> ReadDataFromExcel(string filePath)
+        {
+            List<DataHauKiem> dataList = new List<DataHauKiem>();
+            if (!File.Exists(filePath)) return dataList;
 
-                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                    {
-                        var worksheet = package.Workbook.Worksheets[1];
-                        int rowCount = worksheet.Dimension.Rows;
-                        for (int row = 2; row <= rowCount; row++)
-                        {
-                            dataList.Add(new DataHauKiem
-                            {
-                                NgayThang = worksheet.Cells[row, 1].Text,
-                                SoVanBan = worksheet.Cells[row, 2].Text,
-                                NoiDungVanBan = worksheet.Cells[row, 3].Text,
-                                Loai = worksheet.Cells[row, 4].Text,
-                                Nam = worksheet.Cells[row, 5].Text,
-                                SoQuyetDinh = worksheet.Cells[row, 6].Text,
-                                GhiChu = worksheet.Cells[row, 7].Text,
-                            });
-                        }
-                    }
-                    return dataList;
-                }
-
-                private static void ExportResultToExcel(string filePath, DataHauKiem data, string result)
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                for (int row = 2; row <= rowCount; row++)
                 {
-                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    dataList.Add(new DataHauKiem
                     {
-                        var worksheet = package.Workbook.Worksheets[2];
-                        int rowCount = worksheet.Dimension.Rows;
-                        for (int row = 2; row <= rowCount; row++)
-                        {
-                            if (worksheet.Cells[row, 3].Text == data.NoiDungVanBan)
-                            {
-                                int lastColumn = worksheet.Dimension.Columns + 1;
-                                worksheet.Cells[row, lastColumn].Value = result;
-                                break;
-                            }
-                        }
-                        package.Save();
-                    }
+                        NgayThang = worksheet.Cells[row, 1].Text,
+                        SoVanBan = worksheet.Cells[row, 2].Text,
+                        NoiDungVanBan = worksheet.Cells[row, 3].Text,
+                        Loai = worksheet.Cells[row, 4].Text,
+                        Nam = worksheet.Cells[row, 5].Text,
+                        SoQuyetDinh = worksheet.Cells[row, 6].Text,
+                        GhiChu = worksheet.Cells[row, 7].Text,
+                    });
                 }
             }
+            return dataList;
+        }
 
-    public class DataHauKiem
+        private static void ExportResultToExcel(string filePath, DataHauKiem data, string result)
         {
-            public string NgayThang { get; set; }
-            public string SoVanBan { get; set; }
-            public string NoiDungVanBan { get; set; }
-            public string Loai { get; set; }
-            public string Nam { get; set; }
-            public string SoQuyetDinh { get; set; }
-            public string GhiChu { get; set; }
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[2];
+                int rowCount = worksheet.Dimension.Rows;
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    if (worksheet.Cells[row, 3].Text == data.NoiDungVanBan)
+                    {
+                        int lastColumn = worksheet.Dimension.Columns + 1;
+                        worksheet.Cells[row, lastColumn].Value = result;
+                        break;
+                    }
+                }
+                package.Save();
+            }
         }
     }
+
+    public class DataHauKiem
+    {
+        public string NgayThang { get; set; }
+        public string SoVanBan { get; set; }
+        public string NoiDungVanBan { get; set; }
+        public string Loai { get; set; }
+        public string Nam { get; set; }
+        public string SoQuyetDinh { get; set; }
+        public string GhiChu { get; set; }
+    }
+}

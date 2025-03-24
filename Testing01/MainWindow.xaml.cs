@@ -9,6 +9,7 @@ using System.Threading;
 
 
 
+
 namespace Testing01
 {
     public partial class MainWindow : System.Windows.Window
@@ -75,8 +76,20 @@ namespace Testing01
                 Debug.WriteLine("Đã nhấn vào nút mở popup.");
 
                 // Chờ popup hiển thị
-                Thread.Sleep(2000);
+                Thread.Sleep(5000);
                 Debug.WriteLine("Popup đã mở thành công!");
+
+                // Tìm phần tử khác để di chuột đến (hoặc dùng tọa độ 0,0)
+                IWebElement body = chromeDriver.FindElement(By.TagName("body"));
+                actions.MoveToElement(body, 0, 0).Perform();  // Di chuột ra ngoài
+
+                Debug.WriteLine("Di chuột ra khỏi menu thành công!");
+
+                // Tìm và click vào nút "Thêm mới công trình"
+                WebDriverWait waitt = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(10));
+                IWebElement addNewButton = chromeDriver.FindElement(By.XPath("//button//span[contains(text(), 'Thêm mới')]"));
+                addNewButton.Click();
+                Debug.WriteLine("Mo popup them moi thanh cong");
 
                 //LỌC CÔNG TRÌNH_LOẠI CÔNG TRÌNH 
 
@@ -158,7 +171,7 @@ namespace Testing01
 
         //LỌC CÔNG TRÌNH_TỈNH 
                 // Tìm ô lọc tỉnh 
-                IWebElement filterProvinceDropdown = chromeDriver.FindElement(By.ClassName("filter-province"));
+                //IWebElement filterProvinceDropdown = chromeDriver.FindElement(By.ClassName("filter-province"));
 
                 // Click vào ô lọc tỉnh
                 filterProvinceDropdown.Click();
