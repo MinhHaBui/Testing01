@@ -19,30 +19,28 @@ namespace Testing01
         }
         private void OpenThemMoi_Click(object sender, RoutedEventArgs e)
         {
-            TestThemMoi.ThucHien();
+            TestThemMoi.ThucHienThemMoi();
         }
         private void OpenUpdate_Click(object sender, RoutedEventArgs e)
         {
-            Update UpdateWindow = new Update();
-            UpdateWindow.Show();
+            TestUpdate.Test_EditConstruction();
         }
 
         private void OpenDelete_Click(object sender, RoutedEventArgs e)
         {
-            Delete DeleteWindow = new Delete();
-            DeleteWindow.Show();
+            TestDelete.DeleteConstructionTests.Setup();
+
         }
 
         private void OpenImport_Click(object sender, RoutedEventArgs e)
         {
-            Import ImportWindow = new Import();
-            ImportWindow.Show();
+            TestImport.Test_ImportFile();
         }
 
         private void OpenExport_Click(object sender, RoutedEventArgs e)
         {
-            Export ExportWindow = new Export();
-            ExportWindow.Show();
+            
+            TestExport.TestExportFile();
         }
 
 

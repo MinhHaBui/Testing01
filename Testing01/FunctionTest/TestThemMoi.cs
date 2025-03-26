@@ -24,19 +24,12 @@ namespace Testing01.FunctionTest
             return new ChromeDriver(options);
         }
 
-        public static void ThemMoiCongTrinh()
+        public static void ThucHienThemMoi()
         {
-            string excelFile = @"C:\Users\\minhh\\OneDrive\\Tài liệu\\DoAnTotNghiep\\DataTest.xlsx\";
-            List<ConstructionData> dataList = ReadDataFromExcel(excelFile);
-
-            using (IWebDriver driver = InitWebDriver())
-            {
-
-                ProcessData(driver, dataList, excelFile);
-            }
+            LogIn();
+            ReadExcel();
         }
-
-        public static void ThucHien()
+        public static void LogIn()
         {
 
             // Khởi tạo WebDriver 
@@ -104,27 +97,11 @@ namespace Testing01.FunctionTest
             }
         }
 
-        public static void ProcessData(IWebDriver driver, List<ConstructionData> dataList, string excelFile)
-        {
-            foreach (var data in dataList)
-            {
-                AddNewRecord(driver, data);
-                bool isAdded = CheckIfConstructionExists(driver, data.CongTrinh);
-                Debug.WriteLine(isAdded ? $"{data.CongTrinh} thêm thành công!" : $"{data.CongTrinh} thêm thất bại!");
-                ExportResultToExcel(excelFile, data, isAdded ? "Pass" : "Fail");
-            }
-        }
-
-        private static void ExportResultToExcel(string excelFile, ConstructionData data, string v)
-        {
-            throw new NotImplementedException();
-        }
-
         
         public static void AddNewRecord(IWebDriver chromeDriver, ConstructionData construction)
         {
             chromeDriver.FindElement(By.CssSelector(".MuiButton-colorPrimary.css-boomvj")).Click();
-            WebDriverWait wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(5));
+            //WebDriverWait wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(5));
 
             chromeDriver.FindElement(By.Id("CONG_TRINH")).SendKeys(construction.CongTrinh);
             chromeDriver.FindElement(By.Id("X_UTM")).SendKeys(construction.X_UTM);
@@ -203,6 +180,37 @@ namespace Testing01.FunctionTest
                 return false;
             }
         }
+
+
+        public static void ReadExcel()
+        {
+            string excelFile = @"C:\Users\\minhh\\OneDrive\\Tài liệu\\DoAnTotNghiep\\DataTest.xlsx\";
+            List<ConstructionData> dataList = ReadDataFromExcel(excelFile);
+
+            using (IWebDriver driver = InitWebDriver())
+            {
+
+                ProcessData(driver, dataList, excelFile);
+            }
+        }
+
+        public static void ProcessData(IWebDriver driver, List<ConstructionData> dataList, string excelFile)
+        {
+            foreach (var data in dataList)
+            {
+                AddNewRecord(driver, data);
+                bool isAdded = CheckIfConstructionExists(driver, data.CongTrinh);
+                Debug.WriteLine(isAdded ? $"{data.CongTrinh} thêm thành công!" : $"{data.CongTrinh} thêm thất bại!");
+                ExportResultToExcel(excelFile, data, isAdded ? "Pass" : "Fail");
+            }
+        }
+        public static void ExportResultToExcel(string excelFile, ConstructionData data, string result)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
 
         public static List<ConstructionData> ReadDataFromExcel(string filePath)
         {
@@ -287,41 +295,30 @@ namespace Testing01.FunctionTest
             return dataList;
         }
 
-        public class ExcelExporter
+
+
+        public static void ExportToExcel(string filePath, ConstructionData data, string result)
         {
-            private string filePath;
-            private ConstructionData data;
-            private string result;
-
-            // Constructor để khởi tạo các biến
-            public ExcelExporter(string filePath, ConstructionData data, string result)
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
             {
-                this.filePath = filePath;
-                this.data = data;
-                this.result = result;
-            }
-
-            public void ExportResultToExcel()
-            {
-                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                var worksheet = package.Workbook.Worksheets[2];
+                int rowCount = worksheet.Dimension.Rows;
+                for (int row = 2; row <= rowCount; row++)
                 {
-                    var worksheet = package.Workbook.Worksheets[2];
-                    int rowCount = worksheet.Dimension.Rows;
-
-                    for (int row = 2; row <= rowCount; row++)
+                    if (worksheet.Cells[row, 3].Text == data.CongTrinh)
                     {
-                        if (worksheet.Cells[row, 3].Text == data.CongTrinh)
-                        {
-                            int lastColumn = worksheet.Dimension.Columns + 1;
-                            worksheet.Cells[row, lastColumn].Value = result;
-                            break;
-                        }
+                        int lastColumn = worksheet.Dimension.Columns + 1;
+                        worksheet.Cells[row, lastColumn].Value = result;
+                        break;
                     }
-                    package.Save();
                 }
-            }
-        }
+                package.Save();
 
+            }
+
+
+
+        }
     }
 
     public class ConstructionData
