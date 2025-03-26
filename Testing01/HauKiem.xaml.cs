@@ -43,14 +43,14 @@ namespace Testing01
             options.AddArgument("--start-maximized");
             return new ChromeDriver(options);
         }
-        public static void Main()
+        public static void HauKiemCongTrinh()
         {
             string excelFile = @"C:\\Users\\minhh\\OneDrive\\Tài liệu\\DoAnTotNghiep\\DataTest.xlsx\";
             List<DataHauKiem> dataList = ReadDataFromExcel(excelFile);
 
             using (IWebDriver driver = InitWebDriver())
             {
-                
+
                 ProcessData(driver, dataList, excelFile);
             }
         }

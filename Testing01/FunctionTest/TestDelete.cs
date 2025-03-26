@@ -8,25 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
-namespace Testing01
+namespace Testing01.FunctionTest
 {
-    /// <summary>
-    /// Interaction logic for Delete.xaml
-    /// </summary>
-    public partial class Delete : Window
+    internal class TestDelete
     {
-        public Delete()
+        internal static void Test_DeleteConstruction()
         {
-            InitializeComponent();
+            throw new NotImplementedException();
         }
 
         [TestFixture]
@@ -35,6 +24,17 @@ namespace Testing01
             private IWebDriver driver;
             private WebDriverWait wait;
             private string baseUrl = "https://lake-management.desoft.vn/";
+
+            
+
+            
+            public void Test_DeleteConstruction()
+            {
+                Setup();
+                GoToConstructionPage();
+                DeleteConstruction();
+                VerifyConstructionDeleted();
+            }
 
             [SetUp]
             public void Setup()
@@ -47,23 +47,17 @@ namespace Testing01
 
                 // Đăng nhập vào hệ thống
                 driver.Navigate().GoToUrl(baseUrl);
-                wait.Until(ExpectedConditions.ElementIsVisible(By.Id("email"))).SendKeys("admin");
+                wait.Until(d => d.FindElement(By.Id("email"))).SendKeys("admin");
                 driver.FindElement(By.Id("password")).SendKeys("Abc123456");
                 driver.FindElement(By.XPath("//button[@type='submit']")).Click();
+                wait.Until(d => d.Url == baseUrl);
 
                 // Chờ trang chính load xong
                 wait.Until(d => d.Url == baseUrl);
             }
 
             [Test]
-            public void Test_DeleteConstruction()
-            {
-                GoToConstructionPage();
-                DeleteConstruction("Công trình ABC");
-                VerifyConstructionDeleted("Công trình ABC");
-            }
-
-            private void GoToConstructionPage()
+            public void GoToConstructionPage()
             {
                 // Mở menu "Công trình khai thác"
                 IWebElement menu = wait.Until(d => d.FindElement(By.XPath("//li[@title='Công trình khai thác']")));
@@ -75,13 +69,14 @@ namespace Testing01
                 listButton.Click();
             }
 
-            private void DeleteConstruction(string constructionName)
+            public void DeleteConstruction()
             {
+                string constructionName = "Sê San 4A";
                 // Tìm công trình cần xóa
                 IWebElement row = wait.Until(d => d.FindElements(By.XPath("//table//tr"))
                                                  .FirstOrDefault(tr => tr.Text.Contains(constructionName)));
 
-                Assert.IsNotNull(row, "Không tìm thấy công trình cần xóa!");
+                Assert.That(row, Is.Not.Null, "Không tìm thấy công trình cần xóa!");
 
                 // Click vào nút "Xóa"
                 IWebElement deleteButton = row.FindElement(By.XPath(".//button[contains(@class, 'delete-button')]"));
@@ -95,8 +90,9 @@ namespace Testing01
                 Thread.Sleep(2000);
             }
 
-            private void VerifyConstructionDeleted(string constructionName)
+            public void VerifyConstructionDeleted()
             {
+                string constructionName = "Sê San 4A";
                 // Kiểm tra công trình đã bị xóa khỏi danh sách
                 bool isDeleted = wait.Until(d =>
                 {
@@ -104,7 +100,8 @@ namespace Testing01
                     return rows.All(tr => !tr.Text.Contains(constructionName));
                 });
 
-                Assert.IsTrue(isDeleted, "Công trình chưa được xóa!");
+                Assert.That(isDeleted, "Công trình chưa được xóa!");
+
             }
 
             [TearDown]
@@ -115,3 +112,4 @@ namespace Testing01
         }
     }
 }
+

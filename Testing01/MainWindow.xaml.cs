@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
+using Testing01.FunctionTest;
 
 namespace Testing01
 {
@@ -18,8 +19,7 @@ namespace Testing01
         }
         private void OpenThemMoi_Click(object sender, RoutedEventArgs e)
         {
-            ThemMoi themMoiWindow = new ThemMoi();
-            themMoiWindow.Show();
+            TestThemMoi.ThucHien();
         }
         private void OpenUpdate_Click(object sender, RoutedEventArgs e)
         {
@@ -113,8 +113,8 @@ namespace Testing01
                 Debug.WriteLine("Di chuột ra khỏi menu thành công!");
 
                 // Tìm và click vào nút "Thêm mới công trình"
-                
-                IWebElement addNewButton = chromeDriver.FindElement(By.XPath("//button//span[contains(text(), 'Thêm mới')]"));
+
+                IWebElement addNewButton = chromeDriver.FindElement(By.CssSelector(".MuiButton-colorPrimary.css-boomvj"));
                 addNewButton.Click();
                 Debug.WriteLine("Mo popup them moi thanh cong");
 

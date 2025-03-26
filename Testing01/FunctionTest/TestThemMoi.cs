@@ -1,62 +1,42 @@
 ﻿using OfficeOpenXml;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using OpenQA.Selenium.Interactions;
-using System.Diagnostics;
 using System.Threading;
-using System.Windows.Media.Media3D;
+using System.Threading.Tasks;
 
-
-
-namespace Testing01
-
+namespace Testing01.FunctionTest
 {
-    /// <summary>
-    /// Interaction logic for ThemMoi.xaml
-    /// </summary>
-
-
-    public partial class ThemMoi : Window
+    internal class TestThemMoi
     {
-        public ThemMoi()
-        {
-            InitializeComponent();
-        }
-        private static IWebDriver InitWebDriver()
+        
+        public static IWebDriver InitWebDriver()
         {
             ChromeOptions options = new ChromeOptions();
             options.AddArgument("--start-maximized");
             return new ChromeDriver(options);
         }
 
-        public static void Main()
+        public static void ThemMoiCongTrinh()
         {
             string excelFile = @"C:\Users\\minhh\\OneDrive\\Tài liệu\\DoAnTotNghiep\\DataTest.xlsx\";
             List<ConstructionData> dataList = ReadDataFromExcel(excelFile);
 
             using (IWebDriver driver = InitWebDriver())
             {
-                
+
                 ProcessData(driver, dataList, excelFile);
             }
         }
 
-        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        public static void ThucHien()
         {
 
             // Khởi tạo WebDriver 
@@ -124,7 +104,7 @@ namespace Testing01
             }
         }
 
-        private static void ProcessData(IWebDriver driver, List<ConstructionData> dataList, string excelFile)
+        public static void ProcessData(IWebDriver driver, List<ConstructionData> dataList, string excelFile)
         {
             foreach (var data in dataList)
             {
@@ -135,11 +115,17 @@ namespace Testing01
             }
         }
 
-        private static void AddNewRecord(IWebDriver chromeDriver, ConstructionData construction)
+        private static void ExportResultToExcel(string excelFile, ConstructionData data, string v)
         {
-            chromeDriver.FindElement(By.XPath("//button[contains(text(),'Thêm mới')]")).Click();
+            throw new NotImplementedException();
+        }
+
+        
+        public static void AddNewRecord(IWebDriver chromeDriver, ConstructionData construction)
+        {
+            chromeDriver.FindElement(By.CssSelector(".MuiButton-colorPrimary.css-boomvj")).Click();
             WebDriverWait wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(5));
-            
+
             chromeDriver.FindElement(By.Id("CONG_TRINH")).SendKeys(construction.CongTrinh);
             chromeDriver.FindElement(By.Id("X_UTM")).SendKeys(construction.X_UTM);
             chromeDriver.FindElement(By.Id("Y_UTM")).SendKeys(construction.Y_UTM);
@@ -206,11 +192,11 @@ namespace Testing01
             chromeDriver.FindElement(By.Id("Other")).SendKeys(construction.Khac);
         }
 
-        private static bool CheckIfConstructionExists(IWebDriver driver, string noiDungVanBan)
+        public static bool CheckIfConstructionExists(IWebDriver driver, string CongTrinh)
         {
             try
             {
-                return driver.FindElements(By.XPath("//table//tr/td[2]")).Any(el => el.Text.Contains(noiDungVanBan));
+                return driver.FindElements(By.XPath("//table//tr/td[2]")).Any(el => el.Text.Contains(CongTrinh));
             }
             catch
             {
@@ -218,7 +204,7 @@ namespace Testing01
             }
         }
 
-        private static List<ConstructionData> ReadDataFromExcel(string filePath)
+        public static List<ConstructionData> ReadDataFromExcel(string filePath)
         {
             List<ConstructionData> dataList = new List<ConstructionData>();
             if (!File.Exists(filePath)) return dataList;
@@ -301,24 +287,41 @@ namespace Testing01
             return dataList;
         }
 
-        private static void ExportResultToExcel(string filePath, ConstructionData data, string result)
+        public class ExcelExporter
         {
-            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            private string filePath;
+            private ConstructionData data;
+            private string result;
+
+            // Constructor để khởi tạo các biến
+            public ExcelExporter(string filePath, ConstructionData data, string result)
             {
-                var worksheet = package.Workbook.Worksheets[2];
-                int rowCount = worksheet.Dimension.Rows;
-                for (int row = 2; row <= rowCount; row++)
+                this.filePath = filePath;
+                this.data = data;
+                this.result = result;
+            }
+
+            public void ExportResultToExcel()
+            {
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
                 {
-                    if (worksheet.Cells[row, 3].Text == data.CongTrinh)
+                    var worksheet = package.Workbook.Worksheets[2];
+                    int rowCount = worksheet.Dimension.Rows;
+
+                    for (int row = 2; row <= rowCount; row++)
                     {
-                        int lastColumn = worksheet.Dimension.Columns + 1;
-                        worksheet.Cells[row, lastColumn].Value = result;
-                        break;
+                        if (worksheet.Cells[row, 3].Text == data.CongTrinh)
+                        {
+                            int lastColumn = worksheet.Dimension.Columns + 1;
+                            worksheet.Cells[row, lastColumn].Value = result;
+                            break;
+                        }
                     }
+                    package.Save();
                 }
-                package.Save();
             }
         }
+
     }
 
     public class ConstructionData
@@ -388,4 +391,5 @@ namespace Testing01
         public string BaoCao { get; set; }
         public string Khac { get; set; }
     }
+
 }
