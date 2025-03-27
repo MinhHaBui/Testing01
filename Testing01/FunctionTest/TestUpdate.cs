@@ -15,152 +15,160 @@ namespace Testing01.FunctionTest
 {
     internal class TestUpdate
     {
-        
-
-
+      
         [TestFixture]
-            public class EditConstructionTests
-        {
-            private IWebDriver driver;
-            private WebDriverWait wait;
-            
-
-            
-            public void Test_EditConstruction()
-            {
-                Setup();
-                OpenEditConstructionForm();
-                EditConstructionDetails();
-                VerifyEditedConstruction();
-            }
-
-            [SetUp]
-            public void Setup()
-            {
-                // Khởi tạo WebDriver 
-                ChromeOptions options = new ChromeOptions();
-                options.AddArgument("--start-maximized");
-                IWebDriver chromeDriver = new ChromeDriver(options);
-                Debug.WriteLine("Khởi tạo ChromeDriver thành công.");
-
-                try
+        public class EditConstructionTests
+        {                          
+                [SetUp]
+                public static void Update()
                 {
-                    chromeDriver.Navigate().GoToUrl("https://lake-management.desoft.vn/");
-                    Debug.WriteLine("Đi tới trang đăng nhập.");
+                    // Khởi tạo WebDriver 
+                    ChromeOptions options = new ChromeOptions();
+                    options.AddArgument("--start-maximized");
+                    IWebDriver chromeDriver = new ChromeDriver(options);
+                    Debug.WriteLine("Khởi tạo ChromeDriver thành công.");
 
-                    WebDriverWait wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(10));
+                    try
+                    {
+                        chromeDriver.Navigate().GoToUrl("https://lake-management.desoft.vn/");
+                        Debug.WriteLine("Đi tới trang đăng nhập.");
 
-                    IWebElement eleEmail = wait.Until(driver => driver.FindElement(By.Id("email")));
-                    IWebElement elePwd = chromeDriver.FindElement(By.Id("password"));
-                    IWebElement eleSub = chromeDriver.FindElement(By.XPath("//button[@type='submit']"));
+                        WebDriverWait wait = new WebDriverWait(chromeDriver, TimeSpan.FromSeconds(10));
 
-                    Debug.WriteLine("Tìm thấy các trường đăng nhập.");
+                        IWebElement eleEmail = wait.Until(driver => driver.FindElement(By.Id("email")));
+                        IWebElement elePwd = chromeDriver.FindElement(By.Id("password"));
+                        IWebElement eleSub = chromeDriver.FindElement(By.XPath("//button[@type='submit']"));
 
-                    eleEmail.SendKeys("admin");
-                    Debug.WriteLine("Nhập email xong.");
+                        Debug.WriteLine("Tìm thấy các trường đăng nhập.");
 
-                    elePwd.SendKeys("Abc123456");
-                    Debug.WriteLine("Nhập mật khẩu xong.");
+                        eleEmail.SendKeys("admin");
+                        Debug.WriteLine("Nhập email xong.");
 
-                    eleSub.Click();
-                    Debug.WriteLine("Click nút đăng nhập.");
+                        elePwd.SendKeys("Abc123456");
+                        Debug.WriteLine("Nhập mật khẩu xong.");
 
-                    wait.Until(driver => driver.Url == "https://lake-management.desoft.vn/");
-                    Debug.WriteLine("Đăng nhập thành công!");
+                        eleSub.Click();
+                        Debug.WriteLine("Click nút đăng nhập.");
 
-                    // Chờ menu xuất hiện
-                    IWebElement leftMenu = wait.Until(driver => driver.FindElement(By.XPath("//ul[contains(@class, 'navBar')]")));
-                    Debug.WriteLine("Đã tìm thấy menu bên trái.");
+                        wait.Until(driver => driver.Url == "https://lake-management.desoft.vn/");
+                        Debug.WriteLine("Đăng nhập thành công!");
 
-                    Actions actions = new Actions(chromeDriver);
+                        // Chờ menu xuất hiện
+                        IWebElement leftMenu = wait.Until(driver => driver.FindElement(By.XPath("//ul[contains(@class, 'navBar')]")));
+                        Debug.WriteLine("Đã tìm thấy menu bên trái.");
 
-                    // Hover vào menu
-                    actions.MoveToElement(leftMenu).Perform();
-                    Thread.Sleep(1000); // Chờ menu mở
-                    Debug.WriteLine("Di chuyển chuột đến menu.");
+                        Actions actions = new Actions(chromeDriver);
 
-                    // Tìm menu "Công trình khai thác"
-                    IWebElement menuKhaiThac = wait.Until(driver => driver.FindElement(By.XPath("//li[@title='Công trình khai thác']")));
-                    Debug.WriteLine("Đã tìm thấy menu Công trình khai thác.");
+                        // Hover vào menu
+                        actions.MoveToElement(leftMenu).Perform();
+                        Thread.Sleep(1000); // Chờ menu mở
+                        Debug.WriteLine("Di chuyển chuột đến menu.");
+
+                        // Tìm menu "Công trình khai thác"
+                        IWebElement menuKhaiThac = wait.Until(driver => driver.FindElement(By.XPath("//li[@title='Công trình khai thác']")));
+                        Debug.WriteLine("Đã tìm thấy menu Công trình khai thác.");
 
 
-                    // Tìm nút mở popup trong Công trình khai thác
-                    IWebElement btnKhaiThac = wait.Until(driver => driver.FindElement(By.XPath("//li[@title='Công trình khai thác']//button")));
-                    Debug.WriteLine("Tìm thấy nút mở popup.");
+                        // Tìm nút mở popup trong Công trình khai thác
+                        IWebElement btnKhaiThac = wait.Until(driver => driver.FindElement(By.XPath("//li[@title='Công trình khai thác']//button")));
+                        Debug.WriteLine("Tìm thấy nút mở popup.");
 
-                    // Click vào nút mở popup
-                    btnKhaiThac.Click();
-                    Debug.WriteLine("Đã nhấn vào nút mở popup.");
+                        // Click vào nút mở popup
+                        btnKhaiThac.Click();
+                        Debug.WriteLine("Đã nhấn vào nút mở popup.");
 
-                    // Chờ popup hiển thị
-                    Thread.Sleep(2000);
-                    Debug.WriteLine("Popup đã mở thành công!");
+                        // Chờ popup hiển thị
+                        Thread.Sleep(2000);
+                        Debug.WriteLine("Popup đã mở thành công!");
+
+                        OpenEditConstructionForm(chromeDriver);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Có lỗi xảy ra: " + ex.Message);
+                    }
                 }
-                catch (Exception ex)
+
+
+
+                [Test]
+                public static void OpenEditConstructionForm(IWebDriver chromeDriver)
                 {
-                    Console.WriteLine("Có lỗi xảy ra: " + ex.Message);
-                }
-            }
+                    string constructionName = "Sê San 4A";
+                    // Tìm công trình cần chỉnh sửa
+                    var rows = chromeDriver.FindElements(By.ClassName("fixedDataTableCellLayout_wrap"));
+                    // Duyệt qua từng hàng để tìm công trình theo tên
+                    IWebElement rowToUpdate = null;
 
+                    foreach (var row in rows)
+                    {
+                        if (row.Text.Trim().Equals(constructionName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            rowToUpdate = row;
+                            break;
+                        }
+                    }
 
-
-            [Test]
-            
-
-            public void OpenEditConstructionForm()
-            {
-                string constructionName = "Sê San 4A";
-                // Tìm công trình cần chỉnh sửa
-                IWebElement row = wait.Until(d => d.FindElements(By.XPath("//table//tr"))
-                                                 .FirstOrDefault(tr => tr.Text.Contains(constructionName)));
-
-                Assert.That(row, Is.Not.Null, "Không tìm thấy công trình cần chỉnh sửa!");
+                    Assert.That(rowToUpdate, Is.Not.Null, "Không tìm thấy công trình cần chỉnh sửa!");
+                    Debug.WriteLine("Tim thay cong trinh can sua.");
 
                 // Click vào nút "Sửa"
-                IWebElement editButton = row.FindElement(By.CssSelector("[data-testid='ModeEditOutlinedIcon']"));
-                editButton.Click();
-            }
+                IWebElement editButton = rowToUpdate.FindElement(By.CssSelector("[data-testid='ModeEditOutlinedIcon']"));
+                    editButton.Click();
+                EditConstructionDetails(chromeDriver);
 
-            public void EditConstructionDetails()
-            {
-                string newName = "Kiểm tra";
-                // Chờ trang chỉnh sửa mở
-                IWebElement nameInput = wait.Until(d => d.FindElement(By.Id("name")));
-                nameInput.Clear();
-                nameInput.SendKeys(newName);
+                }
 
-                // Click nút "Lưu"
-                IWebElement saveButton = driver.FindElement(By.CssSelector(".css-m8gy81"));
-                saveButton.Click();
+                public static void EditConstructionDetails(IWebDriver chromeDriver)
+                {
+                    string newName = "Kiểm tra";
+                    // Chờ trang chỉnh sửa mở
+                    IWebElement nameInput = chromeDriver.FindElement(By.Id("name"));
+                    nameInput.Clear();
+                    nameInput.SendKeys(newName);
 
-                // Chờ thay đổi được lưu
-                Thread.Sleep(2000);
-            }
+                    // Click nút "Lưu"
+                    IWebElement saveButton = chromeDriver.FindElement(By.CssSelector(".css-m8gy81"));
+                    saveButton.Click();
 
-            public void VerifyEditedConstruction()
+                    // Chờ thay đổi được lưu
+                    Thread.Sleep(2000);
+                VerifyEditedConstruction(chromeDriver);
+                
+
+                }
+
+            public static void VerifyEditedConstruction(IWebDriver chromeDriver)
             {
                 string expectedName = "Kiểm tra";
-                // Kiểm tra công trình đã được chỉnh sửa
-                IWebElement updatedRow = wait.Until(d => d.FindElements(By.XPath("//table//tr"))
-                                                          .FirstOrDefault(tr => tr.Text.Contains(expectedName)));
+                var rows = chromeDriver.FindElements(By.ClassName("fixedDataTableCellLayout_wrap"));
+                // Duyệt qua từng hàng để tìm công trình theo tên
+                IWebElement updatedRow = null;
 
+                foreach (var row in rows)
+                {
+                    if (row.Text.Trim().Equals(expectedName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        updatedRow = row;
+                        break;
+                    }
+                }
+
+                Assert.That(updatedRow, Is.Not.Null, "Khong tim thay cong trinh vua chinh sua");
+                Debug.WriteLine("Tim thay cong trinh vua chinh sua.");
                 Assert.That(updatedRow, Is.Not.Null, "Công trình chưa được cập nhật!");
-
+                TearDown(chromeDriver);
             }
 
             [TearDown]
-            public void TearDown()
+            public static void TearDown(IWebDriver chromeDriver)
             {
-                driver.Quit();
+                chromeDriver.Quit();
             }
 
         }
-        internal static void Test_EditConstruction()
-        {
-            throw new NotImplementedException();
-
-
-        }
+        
 
     }
 }

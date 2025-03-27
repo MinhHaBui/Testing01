@@ -23,24 +23,30 @@ namespace Testing01
         }
         private void OpenUpdate_Click(object sender, RoutedEventArgs e)
         {
-            TestUpdate.Test_EditConstruction();
+            TestUpdate.EditConstructionTests.Update();
         }
 
         private void OpenDelete_Click(object sender, RoutedEventArgs e)
         {
-            TestDelete.DeleteConstructionTests.Setup();
+            TestDelete.DeleteConstructionTests.Delete();
 
         }
 
         private void OpenImport_Click(object sender, RoutedEventArgs e)
         {
-            TestImport.Test_ImportFile();
+            TestImport.ImportFileTests.ImportFile();
         }
 
         private void OpenExport_Click(object sender, RoutedEventArgs e)
         {
             
-            TestExport.TestExportFile();
+            TestExport.ExportFileTests.Export();
+        }
+
+        private void OpenDate_Click(object sender, RoutedEventArgs e)
+        {
+
+            TestDateTime.DateTime();
         }
 
 

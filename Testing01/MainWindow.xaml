@@ -13,6 +13,7 @@
         <Button Content="Delete" Click="OpenDelete_Click" Margin="0,127,550,186"></Button>
         <Button Content="Import" Click=" OpenImport_Click" Margin="255,127,296,186"></Button>
         <Button Content="Export" Click="OpenExport_Click" Margin="507,127,10,186"></Button>
+        <Button Content="Date" Click="OpenDate_Click" Margin="0,255,550,56"></Button>
     </Grid>
 
 

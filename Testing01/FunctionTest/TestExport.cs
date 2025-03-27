@@ -11,40 +11,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using OpenQA.Selenium.Interactions;
 using System.Diagnostics;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace Testing01.FunctionTest
 {
     internal class TestExport
-    {
-        public TestExport() { }
-
-        internal static void TestExportFile()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal static void Test_ExportFile()
-        {
-            throw new NotImplementedException();
-        }
-
+    {   
         [TestFixture]
         public class ExportFileTests
-        {
-            private IWebDriver driver;
-            private WebDriverWait wait;
-            
-            private string downloadPath = @"C:\Users\Public\Downloads\"; // Thư mục tải file
-
-            public void TestExportFile() 
-            {
-                Setup();
-                Test_ExportFile();
-                TearDown();
-            }
-
+        {            
             [SetUp]
-            public void Setup()
+            public static void Export()
             {
                 // Khởi tạo WebDriver 
                 ChromeOptions options = new ChromeOptions();
@@ -104,6 +81,8 @@ namespace Testing01.FunctionTest
                     // Chờ popup hiển thị
                     Thread.Sleep(2000);
                     Debug.WriteLine("Popup đã mở thành công!");
+
+                    Test_ExportFile(chromeDriver);
                 }
                 catch (Exception ex)
                 {
@@ -111,13 +90,10 @@ namespace Testing01.FunctionTest
                 }
             }
 
-
-
             [Test]
-            public void Test_ExportFile()
+            public static void Test_ExportFile(IWebDriver chromeDriver)
             {
-                GoToExportPage();
-                ClickExportButton();
+                GoToExportPage(chromeDriver);
 
                 // Chờ 5 giây để file tải xuống
                 Thread.Sleep(5000);
@@ -126,29 +102,20 @@ namespace Testing01.FunctionTest
                 string latestFile = GetLatestDownloadedFile();
                 Assert.That(!string.IsNullOrEmpty(latestFile), "Không tìm thấy file đã tải xuống!");
 
-
                 // Kiểm tra định dạng file (giả sử file xuất ra là .xlsx)
                 Assert.That(latestFile.EndsWith(".xlsx"), "File export không đúng định dạng!");
             }
 
-            public void GoToExportPage()
+            public static void GoToExportPage(IWebDriver chromeDriver)
             {
-                
-
                 // Tìm và click vào nút Export
-                IWebElement exportBtn = wait.Until(d => d.FindElement(By.CssSelector(".css-14ayiqf")));
+                IWebElement exportBtn = chromeDriver.FindElement(By.CssSelector(".css-14ayiqf"));
                 exportBtn.Click();
             }
 
-            public void ClickExportButton()
+            public static string GetLatestDownloadedFile()
             {
-                // Click vào nút xác nhận Export
-                IWebElement confirmExportBtn = wait.Until(d => d.FindElement(By.XPath("//button[contains(text(), 'Xác nhận')]")));
-                confirmExportBtn.Click();
-            }
-
-            private string GetLatestDownloadedFile()
-            {
+                string downloadPath = @"C:\Users\minhh\Downloads"; 
                 var directory = new DirectoryInfo(downloadPath);
                 var latestFile = directory.GetFiles()
                                           .OrderByDescending(f => f.LastWriteTime)
@@ -158,9 +125,9 @@ namespace Testing01.FunctionTest
             }
 
             [TearDown]
-            public void TearDown()
+            public void TearDown(IWebDriver chromeDriver)
             {
-                driver.Quit();
+                chromeDriver.Quit();
             }
         }
     }

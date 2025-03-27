@@ -27,12 +27,9 @@ namespace Testing01.FunctionTest
         [TestFixture]
         public class DeleteConstructionTests
         {
-            public IWebDriver driver;
-            public WebDriverWait wait;
-            string baseUrl = "https://lake-management.desoft.vn/";
-
+            
             [SetUp]
-            public static void Setup()
+            public static void Delete()
             {
                 // Khởi tạo WebDriver 
                 ChromeOptions options = new ChromeOptions();
@@ -108,45 +105,63 @@ namespace Testing01.FunctionTest
             {
                
                 string constructionName = "Kiem tra";
-                // Tìm công trình cần xóa
-                IWebElement row = chromeDriver.FindElements(By.XPath("//table//tr"))
-                                                 .FirstOrDefault(tr => tr.Text.Contains(constructionName));
+                
+                // Tìm tất cả các hàng có thể chứa công trình
+                var rows = chromeDriver.FindElements(By.ClassName("fixedDataTableCellLayout_wrap"));
+                // Duyệt qua từng hàng để tìm công trình theo tên
+                IWebElement rowToDelete = null;
+                foreach (var row in rows)
+                {
+                    if (row.Text.Trim().Equals(constructionName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        rowToDelete = row;
+                        break;
+                    }
+                }
 
-                Assert.That(row, Is.Not.Null, "Khong tim thay cong trinh can xoa!");
+                Assert.That(rowToDelete, Is.Not.Null, "Khong tim thay cong trinh can xoa!");
+                Debug.WriteLine("Tim thay cong trinh can xoa!");
 
                 // Click vào nút "Xóa"
-                IWebElement deleteButton = row.FindElement(By.CssSelector("data-testid='DeleteForeverOutlinedIcon'"));
+                IWebElement deleteButton = rowToDelete.FindElement(By.CssSelector("data-testid='DeleteForeverOutlinedIcon'"));
                 deleteButton.Click();
 
-                // Xác nhận xóa
+                // Xác nhận xóa 
                 IWebElement confirmButton = chromeDriver.FindElement(By.CssSelector(".css-p7k7eh"));
                 confirmButton.Click();
 
                 // Chờ hệ thống xử lý
                 Thread.Sleep(2000);
 
-                //VerifyConstructionDeleted(wait);
+                VerifyConstructionDeleted(chromeDriver);
             }
 
-            public static void VerifyConstructionDeleted(WebDriverWait wait)
+            public static void VerifyConstructionDeleted(IWebDriver chromeDriver)
             {
 
-                string constructionName = "Sê San 4A";
+                string constructionName = "Kiem tra";
                 // Kiểm tra công trình đã bị xóa khỏi danh sách
-                bool isDeleted = wait.Until(d =>
+                var rows = chromeDriver.FindElements(By.ClassName("fixedDataTableCellLayout_wrap"));
+                // Duyệt qua từng hàng để tìm công trình theo tên
+                IWebElement rowDelete = null;
+                foreach (var row in rows)
                 {
-                    var rows = d.FindElements(By.XPath("//table//tr"));
-                    return rows.All(tr => !tr.Text.Contains(constructionName));
-                });
+                    if (row.Text.Trim().Equals(constructionName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        rowDelete = row;
+                        break;
+                    }
+                }
 
-                Assert.That(isDeleted, "Công trình chưa được xóa!");
-
+                Assert.That(rowDelete, Is.Null, "Chua xoa cong trinh thanh cong");
+                Debug.WriteLine("Da xoa cong trinh thanh cong");
+                TearDown(chromeDriver);
             }
 
             [TearDown]
-            public void TearDown()
+            public static void TearDown(IWebDriver chromeDriver)
             {
-                driver.Quit();
+                chromeDriver.Quit();
             }
         }
     }

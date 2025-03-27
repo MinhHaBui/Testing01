@@ -170,6 +170,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FunctionTest\TestDateTime.cs" />
     <Compile Include="FunctionTest\TestDelete.cs" />
     <Compile Include="FunctionTest\TestExport.cs" />
     <Compile Include="FunctionTest\TestImport.cs" />
